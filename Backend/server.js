@@ -81,7 +81,7 @@ app.get('/api/courses', async (req, res) => {
         const courses = await Course.find(query)
             .skip(skip)   // Προσπέρασε τα προηγούμενα
             .limit(limit); // Φέρε μόνο 20
-
+            
         // 3. Επιστρέφουμε δεδομένα ΚΑΙ πληροφορίες σελιδοποίησης
         res.json({
             courses, // Τα μαθήματα της τρέχουσας σελίδας
