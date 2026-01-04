@@ -23,7 +23,7 @@ mongoose.connect(MONGO_URI)
 ### 2.1 Αναζήτηση & Φιλτράρισμα Μαθημάτων
 Επιστρέφει λίστα μαθημάτων με σελιδοποίηση (pagination).
 
-`Endpoint`: GET /api/courses
+Endpoint: `GET /api/courses`
 
 Παράμετρος | Τύπος | Περιγραφή
 --- | --- | ---
@@ -37,12 +37,12 @@ language |Query |Φιλτράρισμα ανά γλώσσα
 ### 2.2 Λίστα Κατηγοριών
 Επιστρέφει όλες τις μοναδικές κατηγορίες που υπάρχουν στη βάση (για να γεμίσουν τα φίλτρα στο Frontend).
 
-`Endpoint`: GET /api/categories
+Endpoint: `GET /api/categories`
 
 ### 2.3 Λεπτομέρειες Μαθήματος
 Επιστρέφει αναλυτικά τα στοιχεία ενός συγκεκριμένου μαθήματος βάσει του ID του.
 
-`Endpoint`: GET /api/courses/:id
+Endpoint: `GET /api/courses/:id`
 
 Παράμετρος  |Τύπος  |Περιγραφή
 --- | --- | ---
@@ -51,7 +51,7 @@ language |Query |Φιλτράρισμα ανά γλώσσα
 ### 2.4 Παρόμοια Μαθήματα (ML Recommendation)
 Επιστρέφει τα προτεινόμενα/παρόμοια μαθήματα, όπως έχουν υπολογιστεί από τον Spark αλγόριθμο και έχουν αποθηκευτεί στο collection `similarCourses`.
 
-`Endpoint`: GET /api/courses/:id/similar
+Endpoint: `GET /api/courses/:id/similar`
 
 ## 3. Πως λειτουργεί
 1. O χρήστης κάνει μια ενέργεια στο React Frontend (π.χ. αναζήτηση).
