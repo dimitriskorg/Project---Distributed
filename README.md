@@ -21,7 +21,7 @@
 * **Όνομα Βάσης:** `coursesApplication`
 * **Collections:**
   1. `courses`
-  2. `similarity_courses`
+  2. `similarCourses`
 
 ### 3. Εκκίνηση Node.js server
 Για να τρέξεις τον Node.js server ανοίγεις το Terminal, κατευθύνεσε στον φάκελο Backend που είναι το αρχείο server.js και τρέχεις την εντολή: `node server run`
