@@ -1,39 +1,29 @@
-# Οριζόντιο Repository/Aggregator Ανοικτών Μαθημάτων
-> Large-Scale ML εφαρμογή με React, Node.js και Apache Spark.
+# Spark: Data Processing & Machine Learning
+>Τεχνολογίες: Apache Spark, PySpark, MLlib (TF-IDF & LSH) & ETL Pipelines.
 
-## Δομή
-* **Backend**: Node.js API server.
-* **Frontend**: React-based web app (Vite).
-* **Spark**: Κώδικες για τις βασικές λειτουργίες ML (Similarity & Recommendations).
+Ο φάκελος αυτός περιέχει την core λειτουργικότητα του project, υλοποιημένη σε **PySpark**. Εδώ πραγματοποιείται η συλλογή δεδομένων (ETL/Harvesting) και η εκτέλεση των αλγορίθμων Μηχανικής Μάθησης για το σύστημα συστάσεων (Recommendations).
 
-## Quick Start
+## 1. `saving_to_mongodb.py` (ETL & Aggregation)
+Το αρχείο αυτό είναι υπεύθυνο για το **Harvesting** δεδομένων από εξωτερικά APIs (Coursera, OpenLibrary) και την αποθήκευσή τους στη MongoDB.
 
-### 1. Απαραίτητα Προγράμματα
-Για να τρέξεις το project χρειάζεται να έχεις εγκατεστημένα:
+**Πώς λειτουργεί (Driver/Worker Model):**
+Ο κώδικας ακολουθεί την κατανεμημένη λογική του Spark:
+1. **Unified Schema:** Ορίζεται κοινή δομή δεδομένων για να ενοποιηθούν οι διαφορετικές πηγές.
+2. **Driver Node:** Υπολογίζει τον συνολικό όγκο δεδομένων (pagination) και δημιουργεί tasks (offsets).
+3. **Worker Nodes (UDFs):** Ο Driver αναθέτει στους Workers να καλέσουν τα APIs παράλληλα για κάθε σελίδα δεδομένων.
+4. **Union & Write:** Τα δεδομένα ενοποιούνται σε ένα τελικό DataFrame και αποθηκεύονται στο collection `courses`.
 
-* [Node.js](https://nodejs.org/en/download)
-* [React](https://www.geeksforgeeks.org/installation-guide/how-to-install-reactjs-on-windows/)
-* [Spark](https://spark.apache.org/docs/latest/api/python/getting_started/install.html)
-* [MongDB]()
+## 2. `similarity.py` (Machine Learning Pipeline)
+Υλοποιεί το σύστημα συστάσεων χρησιμοποιώντας **Content-Based Filtering**. Στόχος είναι να βρει τα 5 πιο παρόμοια μαθήματα για κάθε μάθημα στη βάση.
 
-### 2. Προετοιμασία Βάσης Δεδομένων (MongoDB)
-Πριν ξεκινήσεις τους servers, δημιούργησε μια βάση δεδομένων:
-* **Όνομα Βάσης:** `coursesApplication`
-* **Collections:**
-  1. `courses`
-  2. `similarity_courses`
-
-### 3. Εκκίνηση Node.js server
-Για να τρέξεις τον Node.js server ανοίγεις το Terminal, κατευθύνεσε στον φάκελο Backend που είναι το αρχείο server.js και τρέχεις την εντολή: `node server run`
-
-### 4. Εκκίνηση React
-
-Για να δουλέψει η React, πρέπει να τρέξεις τον Vite server. Για να γίνει αυτό, ανοίγεις Terminal, κατευθύνεσε στον φάκελο Frontend και τρέχεις την εντολή: `npm run dev` 
-
-### 5. Εκτέλεση αρχείων Spark
-
-Για να τρέξεις τα αρχεία κώδικα σε Spark, θα χρειαστείτε:
-*  **IDE** (VS Code, PyCharm) ή
-* **Terminal** πηγαίνωντας στον φάκελο Spark και τρέχοντας της εντολές
-    1. `spark-submit saving_to_mongodb.py`
-    2. `spark-submit similarity.py`
+**Η διαδικασία (Pipeline):**
+1. **Preprocessing:** Ανάγνωση τίτλων και περιγραφών από τη MongoDB.
+2. **Vectorization (TF-IDF):**
+   * **Tokenizer:** Σπάσιμο κειμένου σε λέξεις.
+   * **StopWordsRemover:** Αφαίρεση κοινών λέξεων (the, and, etc.).
+   * **HashingTF & IDF:** Μετατροπή των λέξεων σε αριθμητικά διανύσματα (vectors). Το Cosine Similarity απαιτεί αριθμητική είσοδο.
+3. **LSH (Locality Sensitive Hashing):**
+   * Χρησιμοποιείται `BucketedRandomProjectionLSH` για τη μείωση του υπολογιστικού κόστους.
+   * Αντί να συγκρίνουμε κάθε μάθημα με όλα τα άλλα ($N^2$), το LSH τοποθετεί τα παρόμοια διανύσματα σε κοινούς "κουβάδες" (buckets).
+4. **Matching:** Υπολογισμός Ευκλείδειας απόστασης (σε normalized vectors) μόνο για τα μαθήματα της ίδιας κατηγορίας.
+5. **Output:** Τα αποτελέσματα αποθηκεύονται στο collection `similarCourses`.
