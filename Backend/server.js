@@ -55,7 +55,7 @@ const SimilarCourse = mongoose.model('SimilarCourse', SimilarCourseSchema, 'simi
 // 1. Endpoint: Αναζήτηση & Φιλτράρισμα με Pagination
 app.get('/api/courses', async (req, res) => {
     try {
-        const { search, category, level, language } = req.query;
+        const { search, category, level, language, source_name } = req.query;
         
         // --- PAGINATION SETUP ---
         // Αν δεν στείλει σελίδα ο χρήστης, πάμε στην 1η. Default όριο το 20.
@@ -70,6 +70,7 @@ app.get('/api/courses', async (req, res) => {
         if (category && category !== 'All') query.category = category;
         if (level && level !== 'All') query.level = level;
         if (language && language !== 'All') query.language = language;
+        if (source_name && source_name !== 'All') query.source_name = source_name;
 
         console.log(`Page: ${page}, Query:`, query);
 
@@ -102,6 +103,39 @@ app.get('/api/categories', async (req, res) => {
         // Το distinct επιστρέφει πίνακα με strings
         const categories = await Course.distinct('category');
         res.json(categories);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 6. Για να φορτώνονται δυναμικά οι κατηγορίες για το frontend
+app.get('/api/languages', async (req, res) => {
+    try {
+        // Το distinct επιστρέφει πίνακα με strings
+        const languages = await Course.distinct('language');
+        res.json(languages);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 6. Για να φορτώνονται δυναμικά οι κατηγορίες για το frontend
+app.get('/api/levels', async (req, res) => {
+    try {
+        // Το distinct επιστρέφει πίνακα με strings
+        const levels = await Course.distinct('level');
+        res.json(levels);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// 6. Για να φορτώνονται δυναμικά οι κατηγορίες για το frontend
+app.get('/api/source_names', async (req, res) => {
+    try {
+        // Το distinct επιστρέφει πίνακα με strings
+        const source_names = await Course.distinct('source_name');
+        res.json(source_names);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
