@@ -18,16 +18,45 @@ export default function FilterPage() {
     const [filters, setFilters] = useState({
         category: searchParams.get('category') || 'All',
         level: searchParams.get('level') || 'All',
-        language: searchParams.get('language') || 'All'
+        language: searchParams.get('language') || 'All',
+        source_name: searchParams.get('source_name') || 'All'
+        
     });
 
     const [categoryOptions, setCategoryOptions] = useState([]);
+    const [languageOptions, setLanguageOptions] = useState([]);
+    const [levelOptions, setLevelOptions] = useState([]);
+    const [sourceNameOptions, setSourceNameOptions] = useState([]);
     
     // Fetch Categories
     useEffect(() => {
         fetch('http://localhost:5000/api/categories')
             .then(res => res.json())
             .then(data => setCategoryOptions(data))
+            .catch(err => console.error(err));
+    }, []);
+
+    // Fetch Languages
+    useEffect(() => {
+        fetch('http://localhost:5000/api/languages')
+            .then(res => res.json())
+            .then(data => setLanguageOptions(data))
+            .catch(err => console.error(err));
+    }, []);
+
+    // Fetch Levels
+    useEffect(() => {
+        fetch('http://localhost:5000/api/levels')
+            .then(res => res.json())
+            .then(data => setLevelOptions(data))
+            .catch(err => console.error(err));
+    }, []);
+
+     // Fetch Source Name
+    useEffect(() => {
+        fetch('http://localhost:5000/api/source_names')
+            .then(res => res.json())
+            .then(data => setSourceNameOptions(data))
             .catch(err => console.error(err));
     }, []);
 
@@ -41,6 +70,8 @@ export default function FilterPage() {
         if (filters.category !== 'All') params.category = filters.category;
         if (filters.level !== 'All') params.level = filters.level;
         if (filters.language !== 'All') params.language = filters.language;
+        if (filters.source_name !== 'All') params.source_name = filters.source_name;
+
         setSearchParams(params);
     };
 
@@ -124,23 +155,25 @@ export default function FilterPage() {
                         {categoryOptions.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </select>
                 </div>
-                {/* ... υπόλοιπα filters ... */}
                 <div style={inputGroup}>
                     <label>Επίπεδο</label>
                     <select name="level" value={filters.level} onChange={handleFilterChange} style={selectStyle}>
                         <option value="All">Όλα τα επίπεδα</option>
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Advanced">Advanced</option>
+                        {levelOptions.map(lev => <option key={lev} value={lev}>{lev}</option>)}
                     </select>
                 </div>
                 <div style={inputGroup}>
                     <label>Γλώσσα</label>
                     <select name="language" value={filters.language} onChange={handleFilterChange} style={selectStyle}>
                         <option value="All">Όλες τις γλώσσες</option>
-                        <option value="en">English (en)</option>
-                        <option value="es">Spanish (es)</option>
-                        <option value="fr">French (fr)</option>
+                        {languageOptions.map(lan => <option key={lan} value={lan}>{lan}</option>)}
+                    </select>
+                </div>
+                <div style={inputGroup}>
+                    <label>Πηγή</label>
+                    <select name="source_name" value={filters.source_name} onChange={handleFilterChange} style={selectStyle}>
+                        <option value="All">Όλες οι πηγές</option>
+                        {sourceNameOptions.map(scn => <option key={scn} value={scn}>{scn}</option>)}
                     </select>
                 </div>
                 <button onClick={handleSearchClick} style={searchButtonStyle}>Εμφάνιση</button>

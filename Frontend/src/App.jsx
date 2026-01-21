@@ -2,11 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Header from './components/Header';
 import Footer from './components/Footer';
-
-import HomePage from './pages/HomePage';
 import SearchPage from './pages/SearchPage';
 import FilterPage from './pages/FilterPage';
-import ViewCoursesList from './pages/ViewCoursesList';
 
 export default function App() {
   return (
