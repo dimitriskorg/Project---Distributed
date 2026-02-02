@@ -36,6 +36,7 @@ def update_courses_with_category_filter():
 
     # === Η ΔΙΟΡΘΩΣΗ ΕΔΩ ===
     # Δημιουργούμε τη στήλη 'text_content' που περιμένει ο Tokenizer.
+    # Χρησιμοποιούμε μόνο lower() για να κρατήσουμε τα Ελληνικά (χωρίς regex που τα σβήνει).
     df_clean = df_clean.withColumn("text_content", lower(col("raw_text")))
 
     # 4. Vectors (TF-IDF)

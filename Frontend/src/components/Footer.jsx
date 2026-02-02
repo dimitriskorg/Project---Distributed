@@ -29,7 +29,7 @@ export default function Footer() {
                 <li>|</li>
                 <li>Dimitris Koligliatis</li>
                 <li>|</li>
-                <li>Dimitris Korgialas</li>
+                <li>Dimitris Korgiala</li>
                 <li>|</li>
                 <li>Lorenco Demaj</li>
                 <li>|</li>

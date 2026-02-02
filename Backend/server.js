@@ -107,36 +107,6 @@ app.get('/api/categories', async (req, res) => {
     }
 });
 
-app.get('/api/levels', async (req, res) => {
-    try {
-        // Το distinct επιστρέφει πίνακα με strings
-        const levels = await Course.distinct('level');
-        res.json(levels);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/api/languages', async (req, res) => {
-    try {
-        // Το distinct επιστρέφει πίνακα με strings
-        const languages = await Course.distinct('language');
-        res.json(languages);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.get('/api/source_names', async (req, res) => {
-    try {
-        // Το distinct επιστρέφει πίνακα με strings
-        const source_names = await Course.distinct('source_name');
-        res.json(source_names);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
 // 2. Endpoint: Λεπτομέρειες Ενός Μαθήματος
 // URL: /api/courses/:id
 app.get('/api/courses/:id', async (req, res) => {
