@@ -1,22 +1,15 @@
 import React, { useState } from 'react';
 
 const Popup = ({ course, onClose }) => {
-    
-    // State για να αποθηκεύσουμε τα παρόμοια μαθήματα
-    // null = δεν πατήθηκε το κουμπί ακόμα
-    // [] = πατήθηκε αλλά δεν βρέθηκαν (ή φορτώνει)
     const [similarCourses, setSimilarCourses] = useState(null);
-    const [isLoading, setIsLoading] = useState(false); // Προαιρετικό: Για να δείχνουμε "Φόρτωση..."
-
-    // Η συνάρτηση που τρέχει ΟΤΑΝ πατηθεί το κουμπί
+    const [isLoading, setIsLoading] = useState(false); 
+    
     const handleSimilarBtn = () => {
         setIsLoading(true);
 
         fetch(`http://localhost:5000/api/courses/${course._id}/similar`)
             .then(res => res.json())
             .then(data => {
-                // Προσοχή: Ελέγχουμε αν υπάρχει το πεδίο similar_courses ή αν επέστρεψε σκέτο array
-                // Με βάση τον τελευταίο μας κώδικα στο server, επιστρέφει αντικείμενο.
                 const results = data.similar_courses || [];
                 setSimilarCourses(results);
                 setIsLoading(false);
@@ -34,15 +27,13 @@ const Popup = ({ course, onClose }) => {
             <div style={styles.modal}>
                 <h2 style={{ marginTop: 0, color: '#333' }}>{course.title}</h2>
                 <hr style={{ margin: '15px 0', border: '0', borderTop: '1px solid #ccc' }} />
-                
-                {/* Scrollable περιοχή */}
+              
                 <div style={{ maxHeight: '60vh', overflowY: 'auto', paddingRight: '10px' }}>
                     <p><strong>Περιγραφή:</strong> {course.description}</p>
                     <p style={{marginTop: '10px'}}><strong>Γλώσσα:</strong> {course.language}</p>
                     <p><strong>Πηγή:</strong> {course.source_name}</p>
                     <p><strong>Επίπεδο:</strong> {course.level}</p>
-                    
-                    {/* Κουμπί για μετάβαση στο site */}
+                
                     <a 
                         href={course.link} 
                         target="_blank" 
@@ -52,16 +43,12 @@ const Popup = ({ course, onClose }) => {
                         Ιστοσελίδα μαθήματος
                     </a>
 
-                    {/* Κουμπί για Σχετικά Μαθήματα */}
-                    {/* Το κρύβουμε αν έχουν ήδη εμφανιστεί τα αποτελέσματα */}
                     {similarCourses === null && (
                         <button onClick={handleSimilarBtn} style={styles.button}>
                             {isLoading ? "Φόρτωση..." : "Σχετικά μαθήματα"}
                         </button>
                     )}
 
-                    {/* --- ΛΙΣΤΑ ΑΠΟΤΕΛΕΣΜΑΤΩΝ --- */}
-                    {/* Εμφανίζεται μόνο αν το similarCourses ΔΕΝ είναι null */}
                     {similarCourses !== null && (
                         <div style={{ marginTop: '20px', borderTop: '1px dashed #ccc', paddingTop: '10px' }}>
                             <h4 style={{marginBottom: '10px'}}>Προτεινόμενα:</h4>
@@ -126,7 +113,7 @@ const styles = {
     button: { 
         display: 'block', 
         textAlign: 'center', 
-        backgroundColor: '#6c757d', // Άλλαξα λίγο το γκρι για να είναι πιο ωραίο
+        backgroundColor: '#6c757d', 
         color: 'white',
         marginTop: '10px',  
         padding: '10px', 
@@ -135,7 +122,7 @@ const styles = {
         border: 'none', 
         fontSize: '16px',
         fontWeight: 'bold',
-        cursor: 'pointer' // Πρόσθεσα κέρσορα
+        cursor: 'pointer' 
     }
 };
 
