@@ -5,18 +5,14 @@ const mongoose = require('mongoose');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// --- MIDDLEWARE ---
-app.use(cors()); // Επιτρέπει την επικοινωνία με το React
-app.use(express.json()); // Επιτρέπει την ανάγνωση JSON δεδομένων
+app.use(cors()); 
+app.use(express.json()); 
 
-// --- ΣΥΝΔΕΣΗ ΜΕ ΒΑΣΗ ΔΕΔΟΜΕΝΩΝ (MONGODB) ---
 const MONGO_URI = 'mongodb://127.0.0.1:27017/coursesApplication'
 mongoose.connect(MONGO_URI)
 .then(() => console.log('MongoDB connected successfully'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-
-// --- MONGOOSE MODELS ---
 const CourseSchema = new mongoose.Schema({
     title: String,
     description: String,
@@ -29,12 +25,9 @@ const CourseSchema = new mongoose.Schema({
     rate: Number           
 });
 
-// 2. Δημιουργούμε το Model
 const Course = mongoose.model('Course', CourseSchema);
 
-// --- Model για Similar Courses ---
 const SimilarCourseSchema = new mongoose.Schema({
-    // Λέμε στη Mongoose ότι το _id είναι String και όχι ObjectId
     _id: String, 
     similar_courses: [
         {
@@ -45,27 +38,17 @@ const SimilarCourseSchema = new mongoose.Schema({
     ]
 });
 
-// ΠΡΟΣΟΧΗ ΕΔΩ: 
-// Το 3ο όρισμα 'similarCourses' είναι το ακριβές όνομα του collection στη βάση σου.
-// Αυτό λέει στη Mongoose: "Μην μαντεύεις ονόματα, πήγαινε ακριβώς εδώ".
 const SimilarCourse = mongoose.model('SimilarCourse', SimilarCourseSchema, 'similarCourses');
 
-// --- ENDPOINTS ---
-
-// 1. Endpoint: Αναζήτηση & Φιλτράρισμα με Pagination
 app.get('/api/courses', async (req, res) => {
     try {
         const { search, category, level, language } = req.query;
-        
-        // --- PAGINATION SETUP ---
-        // Αν δεν στείλει σελίδα ο χρήστης, πάμε στην 1η. Default όριο το 20.
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
 
         let query = {};
 
-        // ... (Τα φίλτρα search, category, level, language παραμένουν ίδια) ...
         if (search) query.title = { $regex: search, $options: 'i' };
         if (category && category !== 'All') query.category = category;
         if (level && level !== 'All') query.level = level;
@@ -73,18 +56,14 @@ app.get('/api/courses', async (req, res) => {
 
         console.log(`Page: ${page}, Query:`, query);
 
-        // 1. Βρίσκουμε το ΣΥΝΟΛΟ των αποτελεσμάτων (χωρίς το όριο)
-        // Αυτό χρειάζεται για να ξέρει το frontend πόσες σελίδες υπάρχουν συνολικά
         const totalCourses = await Course.countDocuments(query);
 
-        // 2. Φέρνουμε ΤΑ ΣΥΓΚΕΚΡΙΜΕΝΑ 20 αποτελέσματα
         const courses = await Course.find(query)
-            .skip(skip)   // Προσπέρασε τα προηγούμενα
-            .limit(limit); // Φέρε μόνο 20
+            .skip(skip)   
+            .limit(limit); 
 
-        // 3. Επιστρέφουμε δεδομένα ΚΑΙ πληροφορίες σελιδοποίησης
         res.json({
-            courses, // Τα μαθήματα της τρέχουσας σελίδας
+            courses, 
             currentPage: page,
             totalPages: Math.ceil(totalCourses / limit),
             totalCourses
@@ -96,10 +75,8 @@ app.get('/api/courses', async (req, res) => {
     }
 });
 
-// 6. Για να φορτώνονται δυναμικά οι κατηγορίες για το frontend
 app.get('/api/categories', async (req, res) => {
     try {
-        // Το distinct επιστρέφει πίνακα με strings
         const categories = await Course.distinct('category');
         res.json(categories);
     } catch (error) {
@@ -107,8 +84,6 @@ app.get('/api/categories', async (req, res) => {
     }
 });
 
-// 2. Endpoint: Λεπτομέρειες Ενός Μαθήματος
-// URL: /api/courses/:id
 app.get('/api/courses/:id', async (req, res) => {
     try {
         const courseId = req.params.id;
@@ -128,22 +103,15 @@ app.get('/api/courses/:id', async (req, res) => {
     }
 });
 
-// 3. Endpoint: Προτάσεις / Παρόμοια Μαθήματα
-// URL: /api/courses/:id/similar
 app.get('/api/courses/:id/similar', async (req, res) => {
     try {
         const courseId = req.params.id;
-
-        // Ψάχνουμε στο collection 'similarCourses' για εγγραφή με το ΙΔΙΟ _id
         const similarData = await SimilarCourse.findById(courseId);
-
-        // Αν δεν βρεθεί εγγραφή, επιστρέφουμε άδειο πίνακα (όχι error)
+        
         if (!similarData) {
             return res.json({ similar_courses: [] });
         }
 
-        // Επιστρέφουμε το αντικείμενο όπως είναι στη βάση
-        // Το frontend περιμένει: data.similar_courses
         res.json(similarData);
 
     } catch (error) {
@@ -152,7 +120,6 @@ app.get('/api/courses/:id/similar', async (req, res) => {
     }
 });
 
-// --- ΕΚΚΙΝΗΣΗ SERVER ---
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
