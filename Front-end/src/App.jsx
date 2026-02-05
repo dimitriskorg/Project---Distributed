@@ -9,10 +9,8 @@ export default function App() {
   return (
     <Router>
       <div className="app-container">
-        {/* 1. HEADER: Μένει πάντα σταθερό */}
         <Header />
 
-        {/* 2. CENTRAL: Αλλάζει ανάλογα με το URL */}
         <main className="main-content">
           <Routes>
         
@@ -21,8 +19,7 @@ export default function App() {
           
           </Routes>
         </main>
-
-        {/* 3. FOOTER: Μένει πάντα σταθερό */}
+        
         <Footer />
       </div>
     </Router>
