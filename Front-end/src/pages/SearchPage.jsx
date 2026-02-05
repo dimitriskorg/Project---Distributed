@@ -6,16 +6,10 @@ export default function SearchPage() {
 
     const [searchParams] = useSearchParams();
     const query = searchParams.get('q');
-    
     const [courses, setCourses] = useState([]);
-    // Νέα states για το pagination
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-
-    // Modal State
-    const [selectedCourse, setSelectedCourse] = useState(null); // Αν είναι null, το modal είναι κλειστό
-
-    // Styles (τα υπάρχοντα + νέα για τα κουμπιά)
+    const [selectedCourse, setSelectedCourse] = useState(null); 
     const containerStyle = { padding: '20px', maxWidth: '1000px', margin: '0 auto' };
     const gridStyle = {
         display: 'grid',
@@ -28,8 +22,6 @@ export default function SearchPage() {
         backgroundColor: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
         display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%'
     };
-    
-    // Style για την μπάρα σελιδοποίησης
     const paginationStyle = {
         display: 'flex',
         justifyContent: 'center',
@@ -49,31 +41,26 @@ export default function SearchPage() {
         fontSize: '16px'
     };
 
-    // Αν αλλάξει η αναζήτηση (νέο query), μηδενίζουμε τη σελίδα στο 1
     useEffect(() => {
         setPage(1);
     }, [query]);
 
     useEffect(() => {
         if (query) {
-            // Στέλνουμε και το page=... στο backend
             fetch(`http://localhost:5000/api/courses?search=${query}&page=${page}&limit=20`)
                 .then(response => response.json())
                 .then(data => {
-                    // Προσοχή: Το backend πλέον επιστρέφει αντικείμενο, όχι σκέτο πίνακα
                     setCourses(data.courses); 
                     setTotalPages(data.totalPages);
                 })
                 .catch(err => console.error("Error:", err));
         }
-    }, [query, page]); // Τρέχει όταν αλλάξει το query ή η σελίδα
+    }, [query, page]); 
 
     const handleDetailsBtn = (course_id) => {
-        // Κάνουμε fetch το συγκεκριμένο μάθημα
         fetch(`http://localhost:5000/api/courses/${course_id}`)
             .then(res => res.json())
             .then(data => {
-                // Ανοίγουμε το modal γεμίζοντας τα δεδομένα
                 setSelectedCourse(data); 
             })
             .catch(err => console.error("Error:", err));
@@ -83,7 +70,6 @@ export default function SearchPage() {
         setSelectedCourse(null);
     };
 
-    // Handlers για τα κουμπιά
     const handleNext = () => {
         if (page < totalPages) setPage(prev => prev + 1);
     };
@@ -133,7 +119,6 @@ export default function SearchPage() {
                 )}
             </div>
 
-            {/* --- PAGINATION CONTROLS --- */}
             {courses.length > 0 && (
                 <div style={paginationStyle}>
                     <button 
@@ -157,11 +142,10 @@ export default function SearchPage() {
                     </button>
                 </div>
             )}
-            {/* --- ΔΙΟΡΘΩΣΗ: ΤΟ POPUP ΕΙΝΑΙ ΕΞΩ ΑΠΟ ΤΟ MAP --- */}
             {selectedCourse && (
                 <Popup 
-                    course={selectedCourse}   // Περνάμε τα δεδομένα (Prop 1)
-                    onClose={closePopup}      // Περνάμε τη συνάρτηση (Prop 2)
+                    course={selectedCourse}   
+                    onClose={closePopup}      
                 />
             )}
         </div>
