@@ -6,15 +6,10 @@ export default function FilterPage() {
     
     const [searchParams, setSearchParams] = useSearchParams();
     const [courses, setCourses] = useState([]);
-    
-    // Pagination State
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [selectedCourse, setSelectedCourse] = useState(null); 
 
-    // Modal State
-    const [selectedCourse, setSelectedCourse] = useState(null); // Αν είναι null, το modal είναι κλειστό
-
-    // Filters State
     const [filters, setFilters] = useState({
         category: searchParams.get('category') || 'All',
         level: searchParams.get('level') || 'All',
@@ -28,7 +23,6 @@ export default function FilterPage() {
     const [levelOptions, setLevelOptions] = useState([]);
     const [sourceNameOptions, setSourceNameOptions] = useState([]);
     
-    // Fetch Categories
     useEffect(() => {
         fetch('http://localhost:5000/api/categories')
             .then(res => res.json())
@@ -36,7 +30,6 @@ export default function FilterPage() {
             .catch(err => console.error(err));
     }, []);
 
-    // Fetch Languages
     useEffect(() => {
         fetch('http://localhost:5000/api/languages')
             .then(res => res.json())
@@ -44,7 +37,6 @@ export default function FilterPage() {
             .catch(err => console.error(err));
     }, []);
 
-    // Fetch Levels
     useEffect(() => {
         fetch('http://localhost:5000/api/levels')
             .then(res => res.json())
@@ -52,7 +44,6 @@ export default function FilterPage() {
             .catch(err => console.error(err));
     }, []);
 
-     // Fetch Source Name
     useEffect(() => {
         fetch('http://localhost:5000/api/source_names')
             .then(res => res.json())
@@ -75,7 +66,6 @@ export default function FilterPage() {
         setSearchParams(params);
     };
 
-    // Fetch Courses Logic
     useEffect(() => {
         const currentParams = new URLSearchParams(searchParams);
         currentParams.set('page', page);
@@ -91,30 +81,23 @@ export default function FilterPage() {
 
     }, [searchParams, page]);
 
-    // Handlers
     const handleNext = () => { if (page < totalPages) setPage(prev => prev + 1); };
     const handlePrev = () => { if (page > 1) setPage(prev => prev - 1); };
 
-    // --- ΔΙΟΡΘΩΣΗ 1: Fetch για το Modal ---
     const handleDetailsBtn = (course_id) => {
-        // Κάνουμε fetch το συγκεκριμένο μάθημα
         fetch(`http://localhost:5000/api/courses/${course_id}`)
             .then(res => res.json())
             .then(data => {
-                // Ανοίγουμε το modal γεμίζοντας τα δεδομένα
                 setSelectedCourse(data); 
             })
             .catch(err => console.error("Error:", err));
     }
 
-    // --- ΔΙΟΡΘΩΣΗ 2: Συνάρτηση κλεισίματος ---
     const closePopup = () => {
         setSelectedCourse(null);
     };
 
-    // --- Styles ---
     const containerStyle = { padding: '20px', maxWidth: '1000px', margin: '0 auto', position: 'relative' };
-    // ... (τα υπόλοιπα styles σου παραμένουν ίδια) ...
     const filtersBarStyle = { display: 'flex', gap: '20px', padding: '25px', backgroundColor: '#f8f9fa', borderRadius: '10px', alignItems: 'flex-end', flexWrap: 'wrap', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', marginTop: '30px' };
     const inputGroup = { display: 'flex', flexDirection: 'column', gap: '8px' , color:'black' };
     const selectStyle = { padding: '10px', borderRadius: '5px', border: '1px solid #ccc', minWidth: '180px', fontSize: '14px' };
@@ -146,7 +129,6 @@ export default function FilterPage() {
         <div style={containerStyle}>
             <h1>Φίλτρα Μαθημάτων</h1>
 
-            {/* --- ΦΙΛΤΡΑ --- */}
             <div style={filtersBarStyle}>
                 <div style={inputGroup}>
                     <label>Κατηγορία</label>
@@ -179,7 +161,6 @@ export default function FilterPage() {
                 <button onClick={handleSearchClick} style={searchButtonStyle}>Εμφάνιση</button>
             </div>
 
-            {/* --- GRID ΑΠΟΤΕΛΕΣΜΑΤΩΝ --- */}
             <div style={gridStyle}>
                 {courses.length > 0 ? (
                     courses.map((course) => (
@@ -199,7 +180,6 @@ export default function FilterPage() {
                                     <span style={{ color: '#007bff' }}>{course.source_name}</span>
                                     <span style={{ color: '#007bff' }}>{course.language}</span>
                                 </div>          
-                                {/* ΔΙΟΡΘΩΣΗ: Arrow function στο onClick */}
                                 <button 
                                     onClick={() => handleDetailsBtn(course._id)} 
                                     style={{ display: 'block', width: '100%', textAlign: 'center', backgroundColor: '#0056D2', color: 'white', marginTop: '5px', padding: '10px', borderRadius: '5px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer', border: 'none' }}>
@@ -213,7 +193,6 @@ export default function FilterPage() {
                 )}
             </div>
 
-            {/* --- PAGINATION --- */}
             {courses.length > 0 && (
                 <div style={paginationStyle}>
                     <button style={{...btnPageStyle, opacity: page === 1 ? 0.5 : 1}} onClick={handlePrev} disabled={page === 1}>&laquo; Prev</button>
@@ -222,11 +201,10 @@ export default function FilterPage() {
                 </div>
             )}
 
-            {/* --- ΔΙΟΡΘΩΣΗ: ΤΟ POPUP ΕΙΝΑΙ ΕΞΩ ΑΠΟ ΤΟ MAP --- */}
             {selectedCourse && (
                 <Popup 
-                    course={selectedCourse}   // Περνάμε τα δεδομένα (Prop 1)
-                    onClose={closePopup}      // Περνάμε τη συνάρτηση (Prop 2)
+                    course={selectedCourse}   
+                    onClose={closePopup}      
                 />
             )}
 
